@@ -448,7 +448,6 @@ public:
         glPushMatrix();{
             glColor3f(color.r,color.g,color.b);
             glTranslatef(centre.x,centre.y,centre.z);
-            //drawSphere(radius,20,20);
             glutSolidSphere(radius,20,20);
         }
         glPopMatrix();
@@ -497,8 +496,6 @@ public:
     }
 
     double intersect(Ray r, Color *current_color, int level){
-        //current_color = this->getColor();
-        //setColorAt();
         double t = getT(r);
 
         if(t <= 0) return -1;
@@ -516,11 +513,7 @@ public:
         Vector Reflection = getReflection(r,normal);
 
         for(int i = 0; i < lights.size(); i++){
-            Vector lightDir;
-            /*ldir.x = lights[i].v.x - intersectionPoint.x;
-            ldir.y = lights[i].v.y - intersectionPoint.y;
-            ldir.z = lights[i].v.z - intersectionPoint.z;*/
-            lightDir = lights[i].getLightSource().Minus(intersectionPoint);
+            Vector lightDir = lights[i].getLightSource().Minus(intersectionPoint);
 
             double value = lightDir.getValue();
             lightDir = lightDir.normalize();
@@ -534,7 +527,6 @@ public:
 
             for(int j = 0; j < Obj.size(); j++){
                 double p = Obj[j]->getT(L);
-                //printf(",%f %d, ", possibleobscure, j);
                 if(p > 0 && abs(p) < value){
                     flag = true;
                     break;
@@ -543,17 +535,13 @@ public:
             //printf("\n");
 
             if(!flag){
-                //printf("direct");
-                //L.dir.x = -L.dir.x;
-                //L.dir.y = -L.dir.y;
-                //L.dir.z = -L.dir.z;
                 double lambert = L.dir.dot(normal);
                 double phong = Reflection.dot(r.dir);
 
                 lambert = lambert < 0? 0:lambert;
                 lambert = lambert > 1? 1:lambert;
                 phong = phong < 0?0:phong;
-                phong = phong < 0?0:phong;
+                phong = phong > 1?1:phong;
 
 
 
@@ -567,9 +555,6 @@ public:
         if(level < recursion_level){
                 Vector res;
                 res = getResult(intersectionPoint,Reflection,1);
-
-
-                //reflection = normalize(reflection);
 
                 Ray reflectionRay(res, Reflection);
                 int nearest = -1;
@@ -607,7 +592,7 @@ public:
     }
 
     void setColorAt(){
-        //color = color.Mul(this->coefficient[AMBIENT]);
+
     }
 
 
@@ -655,8 +640,6 @@ public:
     }
 
     double getT(Ray r){
-        /*struct point normal = getNormal(reference_point);
-        return ((-1.0) * dotProduct(normal, r->start) / dotProduct(normal, r->dir));*/
         Vector normal = Vector(0,0,1);
         double t = ((-1.0*normal.dot(r.start)))/(normal.dot(r.dir));
         return t;
@@ -696,11 +679,7 @@ public:
             double value = lightDir.getValue();
             lightDir = lightDir.normalize();
 
-            Vector lightSource;
-            /*lstart.x = intersectionPoint.x + ldir.x * 1.0;
-            lstart.y = intersectionPoint.y + ldir.y * 1.0;
-            lstart.z = intersectionPoint.z + ldir.z * 1.0;*/
-            lightSource = getResult(intersectionPoint,lightDir,1.0);
+            Vector lightSource = getResult(intersectionPoint,lightDir,1.0);
 
 
             Ray L(lightSource, lightDir);
@@ -709,7 +688,6 @@ public:
 
             for(int j = 0; j < Obj.size(); j++){
                 double p = Obj[j]->getT(L);
-                //printf(",%f %d, ", possibleobscure, j);
                 if(p > 0 && abs(p) < value){
                     flag = true;
                     break;
@@ -718,10 +696,6 @@ public:
             //printf("\n");
 
             if(!flag){
-                //printf("direct");
-                //L.dir.x = -L.dir.x;
-                //L.dir.y = -L.dir.y;
-                //L.dir.z = -L.dir.z;
                 double lambert = L.dir.dot(normal);
                 double phong = Reflection.dot(r.dir);
 
@@ -743,7 +717,6 @@ public:
                 Vector res;
                 res = getResult(intersectionPoint,Reflection,1.0);
 
-                //reflection = normalize(reflection);
 
                 Ray reflectionRay(res, Reflection);
                 int nearest = -1;
@@ -765,9 +738,6 @@ public:
                     if(t != -1){
                         Color rf = reflectColor.Mul(coefficient[REFLECTION]);
                         *current_color = current_color->Plus(rf);
-                        //current_color->r += reflectColor.r*coefficient[REFLECTION];
-                        //current_color->g += reflectColor.g*coefficient[REFLECTION];
-                        //current_color->b += reflectColor.b*coefficient[REFLECTION];
                     }
                 }
             }
@@ -902,11 +872,7 @@ public:
             double value = lightDir.getValue();
             lightDir = lightDir.normalize();
 
-            Vector lightSource;
-            /*lstart.x = intersectionPoint.x + ldir.x * 1.0;
-            lstart.y = intersectionPoint.y + ldir.y * 1.0;
-            lstart.z = intersectionPoint.z + ldir.z * 1.0;*/
-            lightSource = getResult(intersectionPoint,lightDir,1.0);
+            Vector lightSource = getResult(intersectionPoint,lightDir,1.0);
 
 
             Ray L(lightSource, lightDir);
@@ -915,7 +881,6 @@ public:
 
             for(int j = 0; j < Obj.size(); j++){
                 double p = Obj[j]->getT(L);
-                //printf(",%f %d, ", possibleobscure, j);
                 if(p > 0 && abs(p) < value){
                     flag = true;
                     break;
@@ -924,10 +889,6 @@ public:
             //printf("\n");
 
             if(!flag){
-                //printf("direct");
-                //L.dir.x = -L.dir.x;
-                //L.dir.y = -L.dir.y;
-                //L.dir.z = -L.dir.z;
                 double lambert = L.dir.dot(normal);
                 double phong = Reflection.dot(r.dir);
 
@@ -940,9 +901,7 @@ public:
                 Color cc = color.Mul((lambert * coefficient[DIFFUSE] + pow(phong, shine) * coefficient[SPECULAR]));
                 *current_color = current_color->Plus(cc.Mul(1.0));
 
-                //current_color->r += 1.0 * color.r * (lambert * coefficient[DIFFUSE] + pow(phong, shine) * coefficient[SPECULAR]);
-                //current_color->g += 1.0 * color.g * (lambert * coefficient[DIFFUSE] + pow(phong, shine) * coefficient[SPECULAR]);
-                //current_color->b += 1.0 * color.b * (lambert * coefficient[DIFFUSE] + pow(phong, shine) * coefficient[SPECULAR]);
+
             }
         }
            /* if(level<recursion_level)
@@ -958,8 +917,6 @@ public:
             if(level < recursion_level){
                 //Vector res;
                 Vector res = getResult(intersectionPoint,Reflection,1.0);
-
-                //reflection = normalize(reflection);
 
                 Ray reflectionRay(res, Reflection);
                 int nearest = -1;
@@ -987,7 +944,7 @@ public:
             }
 
             //Check whether all current_color pixel value is within 1 or 0 if not set it
-        current_color->r = current_color->r < 0? 0:current_color->r;
+            current_color->r = current_color->r < 0? 0:current_color->r;
             current_color->r = current_color->r > 1? 1:current_color->r;
             current_color->g = current_color->g < 0? 0:current_color->g;
             current_color->g = current_color->g > 1? 1:current_color->g;
@@ -1044,9 +1001,6 @@ void capture(){
     Vector topleft;
     //H = near_distance * tan(pi * fovY/(2.0 * 180));
     //W = aspectRatio * H;
-    /*topleft.x = pos.x + (l.x * distance) - r.x * (window_width/2.0) + u.x * (window_height/2.0);
-    topleft.y = pos.y + (l.y * distance) - r.y * (window_width/2.0) + u.y * (window_height/2.0);
-    topleft.z = pos.z + (l.z * distance) - r.z * (window_width/2.0) + u.z * (window_height/2.0);*/
     //cout<<"Camera : "<<W<<"::"<<H<<endl ;
     Vector expr1 = l.Mul(distance);
     Vector expr2 = u.Mul(window_height/2.0);
